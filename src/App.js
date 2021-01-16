@@ -7,10 +7,11 @@ const App = () => {
   const [welcome, setWelcome] = useState('');
   const [joinSocket, setJoinSocket] = useState({});
   const [data, setData] = useState([]);
+  const [interval, setInterval] = useState(1);
   const endpoint = "http://localhost:4030";
 
-  const handleClick = () => {
-    alert('کونت میخاره؟!!');
+  const handleChange = (e) => {
+    setInterval(Number(e.target.value));
   }
 
   useEffect(() => {
@@ -34,17 +35,26 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    socket.emit('fetchData', (interval*1000));
     socket.on('receiveData', ({text}) => {
-      const textArray = text.map(item => item.trim());
-      setData(textArray);
+      // console.table(text.map((item) => {
+      //   return item.split(',');
+      // }));
+      setData(text);
     });
-  }, []);
+  }, [interval]);
 
   return (
     <div style={{margin: "50px 80px"}}>
       <h1 style={{textAlign: "center"}}>{welcome}</h1>
       <div style={{textAlign: "center"}}>
-        <button onClick={handleClick} style={{backgroundColor: "crimson", color: "white", padding: "10px 20px", borderRadius: "5px", border: "none", cursor: "pointer", fontSize: "20px"}}>Get Data</button>
+        <label>Interval: </label>
+        <select onChange={handleChange} defaultValue={1}>
+          <option >choose interval</option>
+          <option value={1}>1 second</option>
+          <option value={5}>5 second</option>
+          <option value={10}>10 second</option>
+        </select>
       </div>
       <div style={{display: "flex", flexFlow: "row wrap", justifyContent: "space-between", alignContent: "center"}}>
         <h3>{joinSocket.message}</h3>
